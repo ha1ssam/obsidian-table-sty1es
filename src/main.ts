@@ -10,8 +10,10 @@ import {
 	applyStyle,
 	change,
 	effective,
+	findMarker,
+	formatMarker,
+	markerBlock,
 	parseMarker,
-	withMarker,
 } from "./table-style";
 
 const DELIMITER_ROW = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
@@ -25,14 +27,19 @@ function editorRef(editor: Editor): TableRef | null {
 	if (start + 1 >= editor.lineCount() || !DELIMITER_ROW.test(editor.getLine(start + 1))) {
 		return null;
 	}
+	const marker = () => findMarker((n) => editor.getLine(n), start);
 	return {
-		read: () => (start > 0 ? parseMarker(editor.getLine(start - 1)) ?? {} : {}),
+		read: () => {
+			const m = marker();
+			return m >= 0 ? parseMarker(editor.getLine(m)) ?? {} : {};
+		},
 		write: (style) => {
-			const from = Math.max(0, start - 1);
-			const before = [];
-			for (let n = from; n <= start; n++) before.push(editor.getLine(n));
-			const after = withMarker(before, start - from, style);
-			editor.replaceRange(after.join("\n"), { line: from, ch: 0 }, { line: start, ch: before[before.length - 1].length });
+			const m = marker();
+			if (m < 0 && !formatMarker(style)) return true;
+			const from = m >= 0 ? m : start;
+			const above = from > 0 ? editor.getLine(from - 1) : undefined;
+			const insert = markerBlock(style, above).map((l) => `${l}\n`).join("");
+			editor.replaceRange(insert, { line: from, ch: 0 }, { line: start, ch: 0 });
 			return true;
 		},
 	};

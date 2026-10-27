@@ -18,10 +18,11 @@ It works in reading view and in live preview.
 
 ## Where the style is saved
 
-Each table's choices are written in a comment right above it, so they travel with the note:
+Each table's choices are written in a comment above it, followed by a blank line, so they travel with the note. Live preview hides the comment:
 
 ```md
 <!-- table-style: size=120 stripes=on color=blue header=blue width=full -->
+
 | Name | Score |
 |------|-------|
 | Ana  | 10    |

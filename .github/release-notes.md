@@ -1,3 +1,3 @@
 ## Fixed
 
-- Plugin ID is now `table-styles`, as the community directory requires (letters and hyphens only).
+- Tables with a style no longer show as plain text while editing. The style comment now has a blank line under it, and it is hidden in live preview.

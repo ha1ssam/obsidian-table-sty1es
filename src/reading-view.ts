@@ -1,7 +1,14 @@
 import { MarkdownPostProcessorContext, TFile } from "obsidian";
 import type TableStylesPlugin from "./main";
 import { ensureToolbar, removeToolbar } from "./toolbar";
-import { TableRef, applyStyle, effective, parseMarker, withMarker } from "./table-style";
+import {
+	TableRef,
+	applyStyle,
+	effective,
+	findMarker,
+	parseMarker,
+	withMarker,
+} from "./table-style";
 
 /** Acha a tabela na nota a partir do pedaço renderizado no modo leitura. */
 function readingRef(
@@ -23,7 +30,8 @@ function readingRef(
 		read: () => {
 			const found = locate();
 			if (!found) return null;
-			return parseMarker(found.lines[found.tableLine - 1]) ?? {};
+			const marker = findMarker((n) => found.lines[n], found.tableLine);
+			return marker >= 0 ? parseMarker(found.lines[marker]) ?? {} : {};
 		},
 		write: async (style) => {
 			const found = locate();

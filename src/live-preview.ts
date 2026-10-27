@@ -1,8 +1,16 @@
-import { Line } from "@codemirror/state";
-import { EditorView, PluginValue, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { EditorState, Line, RangeSetBuilder, StateField } from "@codemirror/state";
+import {
+	Decoration,
+	DecorationSet,
+	EditorView,
+	PluginValue,
+	ViewPlugin,
+	ViewUpdate,
+} from "@codemirror/view";
+import { editorLivePreviewField } from "obsidian";
 import type TableStylesPlugin from "./main";
 import { ensureToolbar, removeToolbar } from "./toolbar";
-import { TableRef, applyStyle, effective, formatMarker, parseMarker } from "./table-style";
+import { TableRef, applyStyle, effective, findMarker, formatMarker, markerBlock, parseMarker } from "./table-style";
 
 /** No live preview, o Obsidian desenha cada tabela dentro deste elemento. */
 const WIDGET = ".cm-table-widget";
@@ -11,7 +19,38 @@ export interface LivePreviewTables {
 	scan(): void;
 }
 
+/** Esconde no live preview o marcador e a linha em branco abaixo dele. */
+function hiddenMarkers(state: EditorState): DecorationSet {
+	if (!state.field(editorLivePreviewField, false)) return Decoration.none;
+	const builder = new RangeSetBuilder<Decoration>();
+	const doc = state.doc;
+	for (let n = 1; n <= doc.lines; n++) {
+		const line = doc.line(n);
+		if (!line.text.includes("table-style") || !parseMarker(line.text)) continue;
+		const end = n < doc.lines && doc.line(n + 1).text.trim() === "" ? doc.line(n + 1) : line;
+		// Com o cursor ali, mostra o texto para dar para editar.
+		if (state.selection.ranges.some((r) => r.from <= end.to && r.to >= line.from)) continue;
+		builder.add(line.from, end.to, Decoration.replace({ block: true }));
+	}
+	return builder.finish();
+}
+
+const hideMarkers = StateField.define<DecorationSet>({
+	create: hiddenMarkers,
+	update: (deco, tr) => {
+		const modeChanged =
+			tr.startState.field(editorLivePreviewField, false) !==
+			tr.state.field(editorLivePreviewField, false);
+		return tr.docChanged || tr.selection || modeChanged ? hiddenMarkers(tr.state) : deco;
+	},
+	provide: (field) => EditorView.decorations.from(field),
+});
+
 export function livePreviewExtension(plugin: TableStylesPlugin) {
+	return [hideMarkers, tablesPlugin(plugin)];
+}
+
+function tablesPlugin(plugin: TableStylesPlugin) {
 	return ViewPlugin.fromClass(
 		class implements PluginValue, LivePreviewTables {
 			private observer: MutationObserver;
@@ -47,7 +86,6 @@ export function livePreviewExtension(plugin: TableStylesPlugin) {
 			scan() {
 				// Editores das células da tabela não são tratados.
 				if (this.view.dom.parentElement?.closest(WIDGET)) return;
-				const doc = this.view.state.doc;
 				const settings = plugin.settings;
 				for (const widget of Array.from(
 					this.view.contentDOM.querySelectorAll<HTMLElement>(WIDGET)
@@ -56,8 +94,7 @@ export function livePreviewExtension(plugin: TableStylesPlugin) {
 					const table = widget.querySelector<HTMLElement>("table");
 					const line = this.tableLine(widget);
 					if (!table || !line) continue;
-					const marker = line.number > 1 ? parseMarker(doc.line(line.number - 1).text) : null;
-					applyStyle(table, effective(marker ?? {}, settings), settings);
+					applyStyle(table, effective(this.readMarker(line) ?? {}, settings), settings);
 					if (settings.toolbar) {
 						ensureToolbar(
 							plugin,
@@ -79,29 +116,34 @@ export function livePreviewExtension(plugin: TableStylesPlugin) {
 				}
 			}
 
+			/** Linha do marcador (contando do 1), ou null. */
+			private markerLine(table: Line): Line | null {
+				const doc = this.view.state.doc;
+				const n = findMarker((i) => doc.line(i + 1).text, table.number - 1);
+				return n >= 0 ? doc.line(n + 1) : null;
+			}
+
+			private readMarker(table: Line) {
+				const marker = this.markerLine(table);
+				return marker ? parseMarker(marker.text) : null;
+			}
+
 			private ref(widget: HTMLElement): TableRef {
 				return {
 					read: () => {
 						const line = this.tableLine(widget);
-						if (!line) return null;
-						if (line.number === 1) return {};
-						return parseMarker(this.view.state.doc.line(line.number - 1).text) ?? {};
+						return line ? this.readMarker(line) ?? {} : null;
 					},
 					write: (style) => {
 						const line = this.tableLine(widget);
 						if (!line) return false;
+						const marker = this.markerLine(line);
+						if (!marker && !formatMarker(style)) return true;
+						const from = marker?.from ?? line.from;
 						const doc = this.view.state.doc;
-						const prev = line.number > 1 ? doc.line(line.number - 1) : null;
-						const text = formatMarker(style);
-						if (prev && parseMarker(prev.text)) {
-							this.view.dispatch({
-								changes: text
-									? { from: prev.from, to: prev.to, insert: text }
-									: { from: prev.from, to: line.from, insert: "" },
-							});
-						} else if (text) {
-							this.view.dispatch({ changes: { from: line.from, insert: `${text}\n` } });
-						}
+						const above = from > 0 ? doc.lineAt(from - 1).text : undefined;
+						const insert = markerBlock(style, above).map((l) => `${l}\n`).join("");
+						this.view.dispatch({ changes: { from, to: line.from, insert } });
 						return true;
 					},
 				};

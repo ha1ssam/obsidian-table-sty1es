@@ -211,19 +211,37 @@ export function applyStyle(table: HTMLElement, eff: EffectiveStyle, s: TableStyl
 }
 
 /**
+ * A linha do marcador da tabela que começa em `tableLine` (contando do 0),
+ * ou -1. O marcador fica acima da tabela, com uma linha em branco no meio:
+ * sem ela o Obsidian não desenha a tabela no live preview.
+ */
+export function findMarker(getLine: (n: number) => string, tableLine: number): number {
+	let n = tableLine - 1;
+	if (n >= 0 && getLine(n).trim() === "") n--;
+	return n >= 0 && parseMarker(getLine(n)) ? n : -1;
+}
+
+/**
+ * O texto que vai acima da tabela: marcador e linha em branco. Sem marcador,
+ * só a linha em branco quando há texto logo acima (`above`), para a tabela
+ * não grudar nele.
+ */
+export function markerBlock(style: TableStyle, above: string | undefined): string[] {
+	const text = formatMarker(style);
+	if (text) return [text, ""];
+	return above !== undefined && above.trim() !== "" ? [""] : [];
+}
+
+/**
  * Coloca, troca ou remove o marcador acima da linha `tableLine` (a linha do
  * cabeçalho da tabela). Devolve as linhas novas.
  */
 export function withMarker(lines: string[], tableLine: number, style: TableStyle): string[] {
 	const out = lines.slice();
-	const text = formatMarker(style);
-	const hasMarker = tableLine > 0 && parseMarker(out[tableLine - 1]) !== null;
-	if (hasMarker) {
-		if (text) out[tableLine - 1] = text;
-		else out.splice(tableLine - 1, 1);
-	} else if (text) {
-		out.splice(tableLine, 0, text);
-	}
+	const marker = findMarker((n) => out[n], tableLine);
+	if (marker < 0 && !formatMarker(style)) return out;
+	const from = marker >= 0 ? marker : tableLine;
+	out.splice(from, tableLine - from, ...markerBlock(style, out[from - 1]));
 	return out;
 }
 
