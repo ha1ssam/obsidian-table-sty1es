@@ -1,0 +1,68 @@
+/* ---------- Tamanho ---------- */
+
+.ts-table {
+	font-size: calc(var(--ts-scale, 1) * 1em);
+}
+
+.ts-table th,
+.ts-table td {
+	padding: 0.25em 0.75em;
+}
+
+.ts-table.ts-full {
+	width: 100%;
+}
+
+/* ---------- Cores ---------- */
+
+.ts-table.ts-striped tr:nth-child(even) > td {
+	background-color: var(--ts-stripe);
+}
+
+.ts-table.ts-has-header th {
+	background-color: var(--ts-header);
+}
+
+.ts-table.ts-hover tr:hover > td {
+	background-color: var(--ts-row-hover);
+}
+
+/* ---------- Barra da tabela ---------- */
+
+.ts-host {
+	position: relative;
+}
+
+.ts-toolbar {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	z-index: 5;
+	display: flex;
+	gap: 2px;
+	padding: 2px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-primary);
+	box-shadow: var(--shadow-s);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 120ms ease-in-out;
+}
+
+.ts-host:hover > .ts-toolbar,
+.ts-host:focus-within > .ts-toolbar {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.ts-toolbar .ts-button {
+	padding: var(--size-2-1) var(--size-2-2);
+	height: auto;
+}
+
+@media print {
+	.ts-toolbar {
+		display: none;
+	}
+}

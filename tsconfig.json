@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"module": "ESNext",
+		"target": "ES2018",
+		"moduleResolution": "node",
+		"strict": true,
+		"noImplicitAny": true,
+		"isolatedModules": true,
+		"importHelpers": false,
+		"allowSyntheticDefaultImports": true,
+		"lib": ["DOM", "ES2019"]
+	},
+	"include": ["src/**/*.ts"]
+}
