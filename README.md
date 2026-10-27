@@ -39,4 +39,4 @@ Defaults for every table: stripes on or off, stripe color, header color, color s
 
 ## Install manually
 
-Copy `main.js`, `manifest.json` and `styles.css` from the latest release into `<vault>/.obsidian/plugins/table-sty1es/`, then turn the plugin on in Settings → Community plugins.
+Copy `main.js`, `manifest.json` and `styles.css` from the latest release into `<vault>/.obsidian/plugins/table-styles/`, then turn the plugin on in Settings → Community plugins.

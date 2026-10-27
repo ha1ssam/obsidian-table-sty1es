@@ -1,3 +1,3 @@
-## New
+## Fixed
 
-- First release: per-table size, zebra stripes, stripe and header colors, full width.
+- Plugin ID is now `table-styles`, as the community directory requires (letters and hyphens only).

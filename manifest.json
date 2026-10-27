@@ -1,7 +1,7 @@
 {
-	"id": "table-sty1es",
+	"id": "table-styles",
 	"name": "Table Sty1es",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "1.5.0",
 	"description": "Resize each table, add zebra stripes and pick stripe and header colors from a small toolbar.",
 	"author": "Haissam Makki",
