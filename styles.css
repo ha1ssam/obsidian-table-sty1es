@@ -1,64 +1,85 @@
+/*
+ * O Obsidian define fonte, espaçamento e fundo direto em cada célula, com
+ * seletores como `.markdown-rendered td`. Por isso as regras abaixo miram as
+ * células e repetem `.ts-table` para ganhar dessas regras.
+ * `.table-editor` é a tabela do live preview; lá o espaçamento fica em
+ * `.table-cell-wrapper`, dentro de cada célula.
+ */
+
 /* ---------- Tamanho ---------- */
 
-.ts-table {
-	font-size: calc(var(--ts-scale, 1) * 1em);
+.ts-table.ts-table td {
+	font-size: calc(var(--table-text-size) * var(--ts-scale, 1));
 }
 
-.ts-table th,
-.ts-table td {
-	padding: 0.25em 0.75em;
+.ts-table.ts-table th {
+	font-size: calc(var(--table-header-size) * var(--ts-scale, 1));
 }
+
+.ts-table.ts-table:not(.table-editor) td,
+.ts-table.ts-table:not(.table-editor) th,
+.ts-table.table-editor td > .table-cell-wrapper,
+.ts-table.table-editor th > .table-cell-wrapper {
+	padding: calc(var(--size-2-2) * var(--ts-scale, 1)) calc(var(--size-4-2) * var(--ts-scale, 1));
+}
+
+/* ---------- Largura total ---------- */
 
 .ts-table.ts-full {
 	width: 100%;
 }
 
-/* ---------- Cores ---------- */
-
-.ts-table.ts-striped tr:nth-child(even) > td {
-	background-color: var(--ts-stripe);
+/* No live preview a tabela fica numa caixa que só tem a largura dela. */
+.markdown-source-view.mod-cm6 .cm-table-widget .table-wrapper:has(> .ts-table.ts-full) {
+	width: auto;
 }
 
-.ts-table.ts-has-header th {
+/* ---------- Cores ---------- */
+
+.ts-table.ts-table.ts-has-header thead > tr > th {
 	background-color: var(--ts-header);
 }
 
-.ts-table.ts-hover tr:hover > td {
-	background-color: var(--ts-row-hover);
+.ts-table.ts-table.ts-striped tbody > tr:nth-child(even) > td {
+	background-color: var(--ts-stripe);
+}
+
+@media (hover: hover) {
+	.ts-table.ts-table.ts-hover tbody > tr:hover > td {
+		background-color: var(--ts-row-hover);
+	}
 }
 
 /* ---------- Barra da tabela ---------- */
 
-.ts-host {
-	position: relative;
-}
-
 .ts-toolbar {
-	position: absolute;
-	top: 4px;
-	right: 4px;
-	z-index: 5;
+	position: fixed;
+	z-index: var(--layer-popover);
 	display: flex;
 	gap: 2px;
 	padding: 2px;
 	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-s);
+	border-radius: var(--radius-m);
 	background-color: var(--background-primary);
 	box-shadow: var(--shadow-s);
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 120ms ease-in-out;
 }
 
-.ts-host:hover > .ts-toolbar,
-.ts-host:focus-within > .ts-toolbar {
-	opacity: 1;
-	pointer-events: auto;
+.ts-toolbar.is-offscreen {
+	visibility: hidden;
 }
 
 .ts-toolbar .ts-button {
-	padding: var(--size-2-1) var(--size-2-2);
+	padding: var(--size-2-2) var(--size-2-3);
 	height: auto;
+}
+
+.ts-toolbar .ts-size {
+	align-self: center;
+	min-width: 3.5em;
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	color: var(--text-muted);
 }
 
 @media print {

@@ -9,7 +9,7 @@ import {
 } from "@codemirror/view";
 import { editorLivePreviewField } from "obsidian";
 import type TableStylesPlugin from "./main";
-import { ensureToolbar, removeToolbar } from "./toolbar";
+import { ensureToolbar, removeToolbar, updateToolbar } from "./toolbar";
 import { TableRef, applyStyle, effective, findMarker, formatMarker, markerBlock, parseMarker } from "./table-style";
 
 /** No live preview, o Obsidian desenha cada tabela dentro deste elemento. */
@@ -106,9 +106,12 @@ function tablesPlugin(plugin: TableStylesPlugin) {
 						removeToolbar(widget);
 					}
 				}
+				updateToolbar();
 			}
 
 			private tableLine(widget: HTMLElement): Line | null {
+				// Tabela já redesenhada: a posição dela não vale mais.
+				if (!widget.isConnected) return null;
 				try {
 					return this.view.state.doc.lineAt(this.view.posAtDOM(widget));
 				} catch {

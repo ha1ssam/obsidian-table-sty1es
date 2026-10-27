@@ -2,6 +2,7 @@ import { Editor, MarkdownView, Notice, Plugin, debounce } from "obsidian";
 import { LivePreviewTables, livePreviewExtension } from "./live-preview";
 import { registerReadingView } from "./reading-view";
 import { TableStylesSettingTab } from "./settings";
+import { hideToolbar } from "./toolbar";
 import {
 	DEFAULT_SETTINGS,
 	TableAction,
@@ -74,6 +75,10 @@ export default class TableStylesPlugin extends Plugin {
 				},
 			});
 		}
+	}
+
+	onunload() {
+		hideToolbar();
 	}
 
 	async runAction(ref: TableRef | null, table: HTMLElement | null, action: TableAction) {

@@ -79,7 +79,7 @@ export const DEFAULT_SETTINGS: TableStylesSettings = {
 	color: "gray",
 	header: "none",
 	width: "auto",
-	intensity: 8,
+	intensity: 10,
 	hover: true,
 	step: 10,
 	toolbar: true,

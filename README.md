@@ -4,11 +4,11 @@ Style each table in Obsidian on its own: make it bigger or smaller, add zebra st
 
 ## Toolbar
 
-Point at a table (or tap it on mobile) and a small toolbar shows up in its corner:
+Point at a table (or tap it on mobile) and a small toolbar shows up just above it:
 
 | Button | What it does |
 |---|---|
-| − / + | Make the table smaller or bigger |
+| − / + | Make the table smaller or bigger (the current size shows between them) |
 | Stripes | Turn zebra stripes on or off |
 | Palette | Pick the stripe color and the header color |
 | Width | Stretch the table across the whole note |
