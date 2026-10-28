@@ -90,9 +90,9 @@ export function activeColumn(host: HTMLElement): number {
 }
 
 function trackColumn(host: HTMLElement, evt: PointerEvent) {
-	const cell = (evt.target as HTMLElement | null)?.closest?.("td, th");
+	const cell = (evt.target as Element | null)?.closest?.("td, th");
 	const table = targets.get(host)?.getTable();
-	if (!(cell instanceof HTMLTableCellElement) || !table?.contains(cell)) return;
+	if (!cell?.instanceOf(HTMLTableCellElement) || !table?.contains(cell)) return;
 	if (lastColumn.get(host) === cell.cellIndex) return;
 	lastColumn.set(host, cell.cellIndex);
 	if (shown?.host === host) updateAlignButtons();
@@ -136,7 +136,7 @@ export function updateToolbar() {
 		const right = Math.min(rect.right, win.innerWidth - GAP);
 		const left = Math.max(GAP, right - barRect.width);
 		bar.toggleClass("is-offscreen", offscreen);
-		bar.setCssProps({ top: `${top}px`, left: `${left}px` });
+		bar.setCssProps({ "--ts-top": `${top}px`, "--ts-left": `${left}px` });
 	}
 	if (handles) {
 		handles.el.toggleClass("is-offscreen", offscreen);
@@ -162,9 +162,9 @@ function findReplacement(current: Shown): HTMLElement | null {
 	if (!rect) return null;
 	const x = rect.left + Math.min(rect.width / 2, 20);
 	const y = rect.top + Math.min(rect.height / 2, 10);
-	let el = current.host.doc.elementFromPoint(x, y);
-	while (el && !(el instanceof HTMLElement && targets.has(el))) el = el.parentElement;
-	if (el) return el as HTMLElement;
+	let el: Element | null = current.host.doc.elementFromPoint(x, y);
+	while (el && !(el.instanceOf(HTMLElement) && targets.has(el))) el = el.parentElement;
+	if (el?.instanceOf(HTMLElement)) return el;
 	// A tabela andou um pouco (uma linha entrou acima dela): pega a mais próxima.
 	let best: HTMLElement | null = null;
 	let bestDistance = MAX_JUMP;

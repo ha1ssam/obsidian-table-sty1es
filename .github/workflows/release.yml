@@ -11,6 +11,9 @@ on:
 
 permissions:
   contents: write
+  # Para assinar a origem dos arquivos (artifact attestations).
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -37,6 +40,14 @@ jobs:
         run: |
           npm ci
           npm run build
+      - name: Attest build provenance
+        if: steps.version.outputs.exists != 'true'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            styles.css
       - name: Create release
         if: steps.version.outputs.exists != 'true'
         env:

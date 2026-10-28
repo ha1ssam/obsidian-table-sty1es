@@ -67,7 +67,7 @@ export class ColorsModal extends Modal {
 		];
 		for (const [bg, label] of rows) {
 			const row = el.createDiv({ cls: "ts-colors-preview-row", text: label });
-			row.setCssProps({ "background-color": bg, color: textOn(bg) });
+			row.setCssProps({ "--ts-preview-bg": bg, "--ts-preview-text": textOn(bg) });
 		}
 	}
 

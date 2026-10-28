@@ -36,10 +36,10 @@ export class ResizeHandles {
 	/** Coloca as alças sobre a tabela. */
 	layout(table: HTMLTableElement, rect: DOMRect) {
 		this.el.setCssProps({
-			left: `${rect.left}px`,
-			top: `${rect.top}px`,
-			width: `${rect.width}px`,
-			height: `${rect.height}px`,
+			"--ts-left": `${rect.left}px`,
+			"--ts-top": `${rect.top}px`,
+			"--ts-w": `${rect.width}px`,
+			"--ts-h": `${rect.height}px`,
 		});
 		// Durante o arraste a alça não pode ser trocada: perderia o ponteiro.
 		if (this.dragging) return;
@@ -55,7 +55,7 @@ export class ResizeHandles {
 		const headerHeight = header?.getBoundingClientRect().height ?? 0;
 		cells.slice(0, count).forEach((cell, i) => {
 			const x = cell.getBoundingClientRect().right - rect.left;
-			this.cols[i].setCssProps({ left: `${x}px`, height: `${headerHeight}px` });
+			this.cols[i].setCssProps({ "--ts-left": `${x}px`, "--ts-h": `${headerHeight}px` });
 		});
 	}
 

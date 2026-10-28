@@ -35,7 +35,7 @@
 }
 
 /* No live preview a tabela fica numa caixa que só tem a largura dela. */
-.markdown-source-view.mod-cm6 .cm-table-widget .table-wrapper:has(> .ts-table.ts-full) {
+.markdown-source-view.mod-cm6 .cm-table-widget .table-wrapper.ts-full-wrapper {
 	width: auto;
 }
 
@@ -78,11 +78,6 @@
 .ts-table.ts-rows tr,
 .markdown-source-view.mod-cm6 .cm-table-widget .ts-table.ts-rows tr {
 	height: var(--ts-row-h);
-}
-
-/* Modo leitura: se ainda assim passar da nota, rola para o lado. */
-.markdown-preview-view div:has(> table.ts-table.ts-cols) {
-	overflow-x: auto;
 }
 
 /* ---------- Cores: Cor 1 / Cor 2 ---------- */
@@ -132,6 +127,8 @@
 
 .ts-toolbar {
 	position: fixed;
+	top: var(--ts-top);
+	left: var(--ts-left);
 	z-index: var(--layer-popover);
 	display: flex;
 	align-items: center;
@@ -177,6 +174,10 @@
 
 .ts-handles {
 	position: fixed;
+	top: var(--ts-top);
+	left: var(--ts-left);
+	width: var(--ts-w);
+	height: var(--ts-h);
 	z-index: var(--layer-popover);
 	pointer-events: none;
 	--ts-grip: 8px;
@@ -231,6 +232,8 @@
 
 .ts-grip-col {
 	top: 0;
+	left: var(--ts-left);
+	height: var(--ts-h);
 	width: var(--ts-grip);
 	margin-left: calc(var(--ts-grip) / -2);
 	cursor: col-resize;
@@ -265,6 +268,8 @@
 
 .ts-colors-preview-row {
 	padding: var(--size-2-2) var(--size-4-2);
+	background-color: var(--ts-preview-bg);
+	color: var(--ts-preview-text);
 }
 
 .ts-colors-preview-row:first-child {

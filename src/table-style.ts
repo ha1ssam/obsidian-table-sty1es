@@ -387,6 +387,9 @@ export function applyStyle(table: HTMLElement, eff: EffectiveStyle, s: TableStyl
 	table.toggleClass("ts-colored", eff.colors);
 	table.toggleClass("ts-hover", eff.colors && s.hover);
 	table.toggleClass("ts-full", eff.width === "full");
+	// No live preview a tabela fica numa caixa do tamanho dela: alarga a caixa também.
+	const wrapper = table.parentElement;
+	if (wrapper?.hasClass("table-wrapper")) wrapper.toggleClass("ts-full-wrapper", eff.width === "full");
 	const header = stronger(eff.c1, 0.08);
 	const hover = stronger(eff.c2, 0.06);
 	table.setCssProps({

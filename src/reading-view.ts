@@ -114,6 +114,6 @@ export function registerReadingView(plugin: TableStylesPlugin) {
 		};
 
 		// Às vezes a posição do bloco na nota só fica pronta depois.
-		if (!apply()) requestAnimationFrame(apply);
+		if (!apply()) window.requestAnimationFrame(apply);
 	});
 }

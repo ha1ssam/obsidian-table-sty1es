@@ -71,13 +71,13 @@ function tablesPlugin(plugin: TableStylesPlugin) {
 
 			destroy() {
 				this.observer.disconnect();
-				if (this.frame) cancelAnimationFrame(this.frame);
+				if (this.frame) window.cancelAnimationFrame(this.frame);
 				plugin.livePreviews.delete(this);
 			}
 
 			private schedule() {
 				if (this.frame) return;
-				this.frame = requestAnimationFrame(() => {
+				this.frame = window.requestAnimationFrame(() => {
 					this.frame = 0;
 					this.scan();
 				});
