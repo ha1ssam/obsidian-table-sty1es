@@ -95,11 +95,11 @@ function tablesPlugin(plugin: TableStylesPlugin) {
 					const line = this.tableLine(widget);
 					if (!table || !line) continue;
 					applyStyle(table, effective(this.readMarker(line) ?? {}, settings), settings);
-					if (settings.toolbar) {
+					if (settings.toolbar || settings.handles) {
 						ensureToolbar(
 							plugin,
 							widget,
-							() => widget.querySelector<HTMLElement>("table"),
+							() => widget.querySelector<HTMLTableElement>("table"),
 							() => this.ref(widget)
 						);
 					} else {
@@ -147,6 +147,19 @@ function tablesPlugin(plugin: TableStylesPlugin) {
 						const above = from > 0 ? doc.lineAt(from - 1).text : undefined;
 						const insert = markerBlock(style, above).map((l) => `${l}\n`).join("");
 						this.view.dispatch({ changes: { from, to: line.from, insert } });
+						return true;
+					},
+					readDelimiter: () => {
+						const line = this.tableLine(widget);
+						const doc = this.view.state.doc;
+						return line && line.number < doc.lines ? doc.line(line.number + 1).text : null;
+					},
+					writeDelimiter: (text) => {
+						const line = this.tableLine(widget);
+						const doc = this.view.state.doc;
+						if (!line || line.number >= doc.lines) return false;
+						const delimiter = doc.line(line.number + 1);
+						this.view.dispatch({ changes: { from: delimiter.from, to: delimiter.to, insert: text } });
 						return true;
 					},
 				};

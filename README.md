@@ -1,42 +1,64 @@
 # Table Sty1es
 
-Style each table in Obsidian on its own: make it bigger or smaller, add zebra stripes (every other row colored), and pick stripe and header colors.
+Style each table in Obsidian on its own: two-color rows with a matching header, drag the corners to resize, align each column, and make the text bigger or smaller.
+
+Works in reading view and live preview, on desktop and mobile.
+
+## Colors: Color 1 / Color 2
+
+New tables get alternating rows in Color 1 and Color 2, with a slightly stronger shade of Color 1 in the header. Colors are solid, and the text switches between dark and light to stay readable in light and dark themes.
+
+The default palette is pastel blue (`#DCEBFA`) and pastel lilac (`#F5F0FA`). Presets: blue, green, pink, yellow, lilac and peach.
+
+- **Settings:** pick Color 1 and Color 2 for every new table, choose a preset, or press **Reset colors** to go back to the pastel palette. **Default style (no color)** keeps Obsidian's own look.
+- **One table:** the palette button on the toolbar changes only that table: a preset, **Custom colors…**, **Reset colors** (back to your defaults) or **Default style (no color)**.
+
+Themes can use the CSS variables `--tbl-color-1`, `--tbl-color-2`, `--tbl-header` and `--tbl-hover`.
+
+## Resize by dragging
+
+Point at a table (or tap it on mobile) to show the handles:
+
+| Handle | What it does |
+|---|---|
+| Bottom-right corner | Width and height; the width is shared among the columns in proportion |
+| Right edge | Width |
+| Bottom edge | Height |
+| Border between headers | Width of one column |
+
+Columns can't get narrower than a short word, and the table can't get wider than the note. **Double-click** any handle to go back to automatic size.
+
+## Align columns
+
+Point at a cell of the column, then use the **left / center / right** buttons on the toolbar. You can also right-click a header in reading view, or right-click a cell in the editor. Alignment is written the standard Markdown way in the separator row (`:---`, `:---:`, `---:`), so other apps show it too.
 
 ## Toolbar
 
-Point at a table (or tap it on mobile) and a small toolbar shows up just above it:
-
 | Button | What it does |
 |---|---|
-| − / + | Make the table smaller or bigger (the current size shows between them) |
-| Stripes | Turn zebra stripes on or off |
-| Palette | Pick the stripe color and the header color |
+| − / + | Make the text smaller or bigger (the current size shows between them) |
+| Palette | Colors for this table |
+| Align left / center / right | Align the column you last pointed at |
 | Width | Stretch the table across the whole note |
-| Reset | Go back to your default style |
-
-It works in reading view and in live preview.
+| Reset | Go back to your default style (alignment stays) |
 
 ## Where the style is saved
 
 Each table's choices are written in a comment above it, followed by a blank line, so they travel with the note. Live preview hides the comment:
 
 ```md
-<!-- table-style: size=120 stripes=on color=blue header=blue width=full -->
+<!-- table-style: size=120 c1=#dff2e1 c2=#f2faf3 cols=120,200,80 h=240 -->
 
 | Name | Score |
-|------|-------|
+|:-----|:-----:|
 | Ana  | 10    |
 ```
 
-Only the options that differ from your defaults are written. Reset removes the comment.
+Only the options that differ from your defaults are written. Tables without a comment use your defaults, and comments from older versions keep working.
 
 ## Commands
 
-With the cursor in a table: **Make table bigger**, **Make table smaller**, **Toggle table stripes**, **Toggle table full width**, **Reset table style**. Give them hotkeys in Settings → Hotkeys.
-
-## Settings
-
-Defaults for every table: stripes on or off, stripe color, header color, color strength, row highlight on hover, table size, size step, full width, and whether to show the toolbar.
+With the cursor in a table: **Make table bigger / smaller**, **Toggle table colors**, **Reset table colors**, **Toggle table full width**, **Reset table size to automatic**, **Reset table style**, and **Align table column: left / center / right** (the column at the cursor). Give them hotkeys in Settings → Hotkeys, for example one to center a column.
 
 ## Install manually
 

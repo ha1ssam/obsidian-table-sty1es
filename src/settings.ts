@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type TableStylesPlugin from "./main";
-import { COLORS, COLOR_NAMES, MAX_SIZE, MIN_SIZE, isColor } from "./table-style";
+import { DEFAULT_COLORS, MAX_SIZE, MIN_SIZE, PRESETS, normalizeHex } from "./table-style";
 
 export class TableStylesSettingTab extends PluginSettingTab {
 	constructor(app: App, private readonly plugin: TableStylesPlugin) {
@@ -12,57 +12,70 @@ export class TableStylesSettingTab extends PluginSettingTab {
 		const s = this.plugin.settings;
 		containerEl.empty();
 
-		const colorOptions = Object.fromEntries(COLORS.map((c) => [c, COLOR_NAMES[c]]));
-
 		containerEl.createEl("p", {
 			cls: "setting-item-description",
 			text: "These are the defaults for every table. Use the toolbar on a table to change just that one; its choices are saved in a comment right above the table.",
 		});
 
-		new Setting(containerEl).setName("Stripes").setHeading();
+		new Setting(containerEl).setName("Colors").setHeading();
 
 		new Setting(containerEl)
-			.setName("Zebra stripes")
-			.setDesc("Color every other row.")
-			.addToggle((t) => t.setValue(s.stripes).onChange((v) => this.save({ stripes: v })));
-
-		new Setting(containerEl)
-			.setName("Stripe color")
+			.setName("Color scheme")
+			.setDesc("Color 1 / Color 2 colors rows in turns, with a stronger shade of Color 1 in the header. Default style keeps Obsidian's own look.")
 			.addDropdown((d) =>
 				d
-					.addOptions(colorOptions)
-					.setValue(s.color)
-					.onChange((v) => {
-						if (isColor(v)) void this.save({ color: v });
+					.addOption("colors", "Color 1 / Color 2")
+					.addOption("none", "Default style (no color)")
+					.setValue(s.scheme)
+					.onChange(async (v) => {
+						await this.save({ scheme: v === "none" ? "none" : "colors" });
+						this.display();
 					})
 			);
 
-		new Setting(containerEl)
-			.setName("Color strength")
-			.setDesc("How strong the stripe, header and hover colors are.")
-			.addSlider((sl) =>
-				sl
-					.setLimits(3, 40, 1)
-					.setDynamicTooltip()
-					.setValue(s.intensity)
-					.onChange((v) => this.save({ intensity: v }))
-			);
+		if (s.scheme === "colors") {
+			new Setting(containerEl)
+				.setName("Color 1")
+				.setDesc("Odd rows and the header.")
+				.addColorPicker((cp) =>
+					cp.setValue(s.color1).onChange((v) => this.save({ color1: normalizeHex(v) ?? s.color1 }))
+				);
 
-		new Setting(containerEl)
-			.setName("Header color")
-			.addDropdown((d) =>
-				d
-					.addOption("none", "None")
-					.addOptions(colorOptions)
-					.setValue(s.header)
-					.onChange((v) => {
-						if (v === "none" || isColor(v)) void this.save({ header: v });
+			new Setting(containerEl)
+				.setName("Color 2")
+				.setDesc("Even rows.")
+				.addColorPicker((cp) =>
+					cp.setValue(s.color2).onChange((v) => this.save({ color2: normalizeHex(v) ?? s.color2 }))
+				);
+
+			new Setting(containerEl)
+				.setName("Presets")
+				.setDesc("Pick a ready pair of colors.")
+				.addDropdown((d) => {
+					d.addOption("", "Choose…");
+					for (const p of PRESETS) d.addOption(p.id, p.name);
+					d.setValue("").onChange(async (id) => {
+						const preset = PRESETS.find((p) => p.id === id);
+						if (!preset) return;
+						await this.save({ color1: preset.c1, color2: preset.c2 });
+						this.display();
+					});
+				});
+
+			new Setting(containerEl)
+				.setName("Reset colors")
+				.setDesc("Go back to the pastel palette.")
+				.addButton((b) =>
+					b.setButtonText("Reset colors").onClick(async () => {
+						await this.save({ color1: DEFAULT_COLORS.c1, color2: DEFAULT_COLORS.c2 });
+						this.display();
 					})
-			);
+				);
 
-		new Setting(containerEl)
-			.setName("Highlight row on hover")
-			.addToggle((t) => t.setValue(s.hover).onChange((v) => this.save({ hover: v })));
+			new Setting(containerEl)
+				.setName("Highlight row on hover")
+				.addToggle((t) => t.setValue(s.hover).onChange((v) => this.save({ hover: v })));
+		}
 
 		new Setting(containerEl).setName("Size").setHeading();
 
@@ -95,12 +108,17 @@ export class TableStylesSettingTab extends PluginSettingTab {
 				t.setValue(s.width === "full").onChange((v) => this.save({ width: v ? "full" : "auto" }))
 			);
 
-		new Setting(containerEl).setName("Toolbar").setHeading();
+		new Setting(containerEl).setName("On the table").setHeading();
 
 		new Setting(containerEl)
-			.setName("Show toolbar on tables")
-			.setDesc("A small bar in the corner of each table, shown when you point at or tap the table. The commands work either way.")
+			.setName("Show toolbar")
+			.setDesc("A small bar above each table, shown when you point at or tap the table. The commands work either way.")
 			.addToggle((t) => t.setValue(s.toolbar).onChange((v) => this.save({ toolbar: v })));
+
+		new Setting(containerEl)
+			.setName("Show resize handles")
+			.setDesc("Drag the bottom-right corner, the right or bottom edge, or the border between headers. Double-click a handle for automatic size.")
+			.addToggle((t) => t.setValue(s.handles).onChange((v) => this.save({ handles: v })));
 	}
 
 	private async save(patch: Partial<TableStylesPlugin["settings"]>) {

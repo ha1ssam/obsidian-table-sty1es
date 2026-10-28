@@ -4,9 +4,14 @@
  * células e repetem `.ts-table` para ganhar dessas regras.
  * `.table-editor` é a tabela do live preview; lá o espaçamento fica em
  * `.table-cell-wrapper`, dentro de cada célula.
+ *
+ * Cores (definidas pelo plugin em cada tabela, sempre sólidas):
+ *   --tbl-color-1, --tbl-color-2   linhas ímpares e pares
+ *   --tbl-header, --tbl-hover      cabeçalho e linha sob o mouse
+ *   --tbl-text-*, --tbl-link-*     texto e links legíveis sobre cada fundo
  */
 
-/* ---------- Tamanho ---------- */
+/* ---------- Tamanho do texto ---------- */
 
 .ts-table.ts-table td {
 	font-size: calc(var(--table-text-size) * var(--ts-scale, 1));
@@ -34,20 +39,93 @@
 	width: auto;
 }
 
-/* ---------- Cores ---------- */
+/* ---------- Tamanho arrastado (colunas e altura) ---------- */
 
-.ts-table.ts-table.ts-has-header thead > tr > th {
-	background-color: var(--ts-header);
+.ts-table.ts-cols {
+	table-layout: fixed;
+	width: var(--ts-width);
 }
 
-.ts-table.ts-table.ts-striped tbody > tr:nth-child(even) > td {
-	background-color: var(--ts-stripe);
+.ts-table.ts-cols.ts-cols th,
+.ts-table.ts-cols.ts-cols td {
+	box-sizing: border-box;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.ts-table.ts-cols tr > :nth-child(1) { width: var(--ts-col-1); }
+.ts-table.ts-cols tr > :nth-child(2) { width: var(--ts-col-2); }
+.ts-table.ts-cols tr > :nth-child(3) { width: var(--ts-col-3); }
+.ts-table.ts-cols tr > :nth-child(4) { width: var(--ts-col-4); }
+.ts-table.ts-cols tr > :nth-child(5) { width: var(--ts-col-5); }
+.ts-table.ts-cols tr > :nth-child(6) { width: var(--ts-col-6); }
+.ts-table.ts-cols tr > :nth-child(7) { width: var(--ts-col-7); }
+.ts-table.ts-cols tr > :nth-child(8) { width: var(--ts-col-8); }
+.ts-table.ts-cols tr > :nth-child(9) { width: var(--ts-col-9); }
+.ts-table.ts-cols tr > :nth-child(10) { width: var(--ts-col-10); }
+.ts-table.ts-cols tr > :nth-child(11) { width: var(--ts-col-11); }
+.ts-table.ts-cols tr > :nth-child(12) { width: var(--ts-col-12); }
+.ts-table.ts-cols tr > :nth-child(13) { width: var(--ts-col-13); }
+.ts-table.ts-cols tr > :nth-child(14) { width: var(--ts-col-14); }
+.ts-table.ts-cols tr > :nth-child(15) { width: var(--ts-col-15); }
+.ts-table.ts-cols tr > :nth-child(16) { width: var(--ts-col-16); }
+.ts-table.ts-cols tr > :nth-child(17) { width: var(--ts-col-17); }
+.ts-table.ts-cols tr > :nth-child(18) { width: var(--ts-col-18); }
+.ts-table.ts-cols tr > :nth-child(19) { width: var(--ts-col-19); }
+.ts-table.ts-cols tr > :nth-child(20) { width: var(--ts-col-20); }
+
+/* O live preview fixa a altura das linhas em 1px (as células esticam). */
+.ts-table.ts-rows tr,
+.markdown-source-view.mod-cm6 .cm-table-widget .ts-table.ts-rows tr {
+	height: var(--ts-row-h);
+}
+
+/* Modo leitura: se ainda assim passar da nota, rola para o lado. */
+.markdown-preview-view div:has(> table.ts-table.ts-cols) {
+	overflow-x: auto;
+}
+
+/* ---------- Cores: Cor 1 / Cor 2 ---------- */
+
+.ts-table.ts-table.ts-colored thead > tr > th {
+	background-color: var(--tbl-header);
+	--text-normal: var(--tbl-header-text);
+	--link-color: var(--tbl-header-link);
+	--link-external-color: var(--tbl-header-link);
+	--link-unresolved-color: var(--tbl-header-link);
+	color: var(--tbl-header-text);
+}
+
+.ts-table.ts-table.ts-colored tbody > tr:nth-child(odd) > td {
+	background-color: var(--tbl-color-1);
+	--text-normal: var(--tbl-text-1);
+	--text-muted: var(--tbl-text-1);
+	--link-color: var(--tbl-link-1);
+	--link-external-color: var(--tbl-link-1);
+	--link-unresolved-color: var(--tbl-link-1);
+	color: var(--tbl-text-1);
+}
+
+.ts-table.ts-table.ts-colored tbody > tr:nth-child(even) > td {
+	background-color: var(--tbl-color-2);
+	--text-normal: var(--tbl-text-2);
+	--text-muted: var(--tbl-text-2);
+	--link-color: var(--tbl-link-2);
+	--link-external-color: var(--tbl-link-2);
+	--link-unresolved-color: var(--tbl-link-2);
+	color: var(--tbl-text-2);
 }
 
 @media (hover: hover) {
 	.ts-table.ts-table.ts-hover tbody > tr:hover > td {
-		background-color: var(--ts-row-hover);
+		background-color: var(--tbl-hover);
+		color: var(--tbl-hover-text);
 	}
+}
+
+/* Coluna que os botões de alinhamento vão mudar. */
+.ts-table .ts-col-target {
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
 
 /* ---------- Barra da tabela ---------- */
@@ -56,6 +134,7 @@
 	position: fixed;
 	z-index: var(--layer-popover);
 	display: flex;
+	align-items: center;
 	gap: 2px;
 	padding: 2px;
 	border: 1px solid var(--background-modifier-border);
@@ -64,7 +143,8 @@
 	box-shadow: var(--shadow-s);
 }
 
-.ts-toolbar.is-offscreen {
+.ts-toolbar.is-offscreen,
+.ts-handles.is-offscreen {
 	visibility: hidden;
 }
 
@@ -73,8 +153,19 @@
 	height: auto;
 }
 
+.ts-toolbar .ts-button.is-active {
+	color: var(--interactive-accent);
+	background-color: var(--background-modifier-hover);
+}
+
+.ts-toolbar .ts-divider {
+	align-self: stretch;
+	width: 1px;
+	margin: 2px 2px;
+	background-color: var(--background-modifier-border);
+}
+
 .ts-toolbar .ts-size {
-	align-self: center;
 	min-width: 3.5em;
 	font-size: var(--font-ui-smaller);
 	font-variant-numeric: tabular-nums;
@@ -82,8 +173,107 @@
 	color: var(--text-muted);
 }
 
+/* ---------- Alças de redimensionar ---------- */
+
+.ts-handles {
+	position: fixed;
+	z-index: var(--layer-popover);
+	pointer-events: none;
+	--ts-grip: 8px;
+}
+
+.is-mobile .ts-handles {
+	--ts-grip: 18px;
+}
+
+.ts-grip {
+	position: absolute;
+	pointer-events: auto;
+	touch-action: none;
+}
+
+/* As alças ficam por dentro da borda: do lado de fora o live preview tem
+   os botões de adicionar linha e coluna. */
+.ts-grip-right {
+	top: 0;
+	right: 0;
+	bottom: var(--ts-grip);
+	width: var(--ts-grip);
+	cursor: ew-resize;
+}
+
+.ts-grip-bottom {
+	left: 0;
+	right: var(--ts-grip);
+	bottom: 0;
+	height: var(--ts-grip);
+	cursor: ns-resize;
+}
+
+.ts-grip-corner {
+	right: 0;
+	bottom: 0;
+	width: calc(var(--ts-grip) * 1.75);
+	height: calc(var(--ts-grip) * 1.75);
+	cursor: nwse-resize;
+	background: linear-gradient(
+		135deg,
+		transparent 55%,
+		var(--interactive-accent) 55%,
+		var(--interactive-accent) 65%,
+		transparent 65%,
+		transparent 75%,
+		var(--interactive-accent) 75%,
+		var(--interactive-accent) 85%,
+		transparent 85%
+	);
+}
+
+.ts-grip-col {
+	top: 0;
+	width: var(--ts-grip);
+	margin-left: calc(var(--ts-grip) / -2);
+	cursor: col-resize;
+}
+
+.ts-grip-right:hover,
+.ts-grip-bottom:hover,
+.ts-grip-col:hover,
+.ts-grip.is-active {
+	background-color: var(--interactive-accent);
+	opacity: 0.6;
+}
+
+.ts-grip-corner:hover,
+.ts-grip-corner.is-active {
+	background-color: transparent;
+	opacity: 1;
+}
+
+.ts-table.ts-resizing {
+	user-select: none;
+}
+
+/* ---------- Janela de cores ---------- */
+
+.ts-colors-preview {
+	margin: var(--size-4-2) 0;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	overflow: hidden;
+}
+
+.ts-colors-preview-row {
+	padding: var(--size-2-2) var(--size-4-2);
+}
+
+.ts-colors-preview-row:first-child {
+	font-weight: var(--font-semibold);
+}
+
 @media print {
-	.ts-toolbar {
+	.ts-toolbar,
+	.ts-handles {
 		display: none;
 	}
 }
